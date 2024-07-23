@@ -28,7 +28,7 @@ confection==0.1.4
 contourpy==1.2.0
 # cubinlinker
 cuda-python
-cudf
+cudf-cu12
 cugraph 
 # cugraph-dgl
 # cugraph-service-client
@@ -162,7 +162,7 @@ pydantic_core==2.14.6
 Pygments==2.17.2
 pylibcugraph-cu12
 pylibcugraphops-cu12
-pylibraft
+pylibraft-cu12
 pynvml
 pyparsing==3.1.1
 pytest==7.4.4
@@ -176,7 +176,7 @@ pytorch-quantization==2.1.2
 pytz
 PyYAML==6.0.1
 pyzmq==25.1.2
-raft-dask
+raft-dask-cu12
 rapids-dask-dependency
 referencing==0.32.1
 regex==2023.12.25

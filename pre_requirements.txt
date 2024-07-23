@@ -2,3 +2,5 @@ packaging
 wheel
 torch
 nvidia-pyindex
+notebook
+# cudf-cu12

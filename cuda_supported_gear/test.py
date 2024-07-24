@@ -1,5 +1,5 @@
-#
 from modeling_llamagear import LlamaForCausalLM_GEARKIVI
+
 from modeling_llama_kivi import LlamaForCausalLM_KIVI
 from transformers import LlamaConfig, AutoTokenizer, LlamaForCausalLM
 from transformers import BitsAndBytesConfig
@@ -9,6 +9,9 @@ import argparse
 
 
 #### Config for KIVI model
+# import os
+# my_token = os.environ.get("HUGGINGFACE_API_TOKEN")
+# config = LlamaConfig.from_pretrained("meta-llama/Llama-2-7b-hf", token=my_token)
 config = LlamaConfig.from_pretrained("meta-llama/Llama-2-7b-hf")
 
 config.k_bits = 2# current support 2/4 bit for KV Cache
@@ -19,7 +22,8 @@ config.residual_length = 64 # the number of recent fp16 tokens
 # quantization_config = BitsAndBytesConfig(load_in_8bit=True)
 parser = argparse.ArgumentParser(description="Evaluate AQuA Tasks")
 parser.add_argument("--batch_size", type=int, default=8, help="Batch size.")
-parser.add_argument("--model", type=str, default="meta-llama/Llama-2-7b", help="Model name or path.")
+# parser.add_argument("--model", type=str, default="meta-llama/Llama-2-7b", help="Model name or path.")
+parser.add_argument("--model", type=str, default="None", help="Model name or path.")
 args = parser.parse_args()
 
 max_token = 1000 ### prefill_length
@@ -44,6 +48,7 @@ if "gearl" in args.model:
         config = config,
         # quantization_config = quantization_config,
         compress_config = compress_config,
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
         device_map = "cuda:0"
     )
 elif "KIVI" in args.model:
@@ -52,18 +57,21 @@ elif "KIVI" in args.model:
         config = config,
         # quantization_config = quantization_config,
         # compress_config = compress_config,
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
         
         device_map = "cuda:0"
     )
 elif "None" in args.model:
     model = LlamaForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
+        "meta-llama/Llama-2-7b-hf",
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
+        device_map = "cuda:0")
+else:
+    print("args model is not supported. args.model: ", args.model) # 인자가 무조건 필요함.
+    exit(1)
 
-    device_map = "cuda:0")
 model = model.half()
-
-
-
+print(f"model loaded : {model}")
 
 
 tokenizer = AutoTokenizer.from_pretrained(

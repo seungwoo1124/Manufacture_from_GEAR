@@ -48,7 +48,7 @@ if "gearl" in args.model:
         config = config,
         # quantization_config = quantization_config,
         compress_config = compress_config,
-        # torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
         device_map = "cuda:0"
     )
 elif "KIVI" in args.model:
@@ -57,21 +57,20 @@ elif "KIVI" in args.model:
         config = config,
         # quantization_config = quantization_config,
         # compress_config = compress_config,
-        # torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
         
         device_map = "cuda:0"
     )
 elif "None" in args.model:
     model = LlamaForCausalLM.from_pretrained(
         "meta-llama/Llama-2-7b-hf",
-        # torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
+        torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
         device_map = "cuda:0")
 else:
     print("args model is not supported. args.model: ", args.model) # 인자가 무조건 필요함.
     exit(1)
 
-model = model.half()
-print(f"model loaded : {model}")
+model = model.half() # it is model.to(torch.float16)
 
 peak_memory = torch.cuda.max_memory_allocated(device="cuda") / (1024**2)
 print(f"Peak memory usage on GPU for model loading: {peak_memory} MB")

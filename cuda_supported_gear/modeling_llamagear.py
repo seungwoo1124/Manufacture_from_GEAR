@@ -797,6 +797,8 @@ class LlamaForCausalLM_GEARKIVI(LlamaPreTrainedModel):
             return_dict=return_dict,
         )
 
+        print(outputs)
+
         hidden_states = outputs[0]
         if self.config.pretraining_tp > 1:
             lm_head_slices = self.lm_head.weight.split(self.vocab_size // self.config.pretraining_tp, dim=0)
@@ -835,6 +837,7 @@ class LlamaForCausalLM_GEARKIVI(LlamaPreTrainedModel):
         self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs
     ):
         if past_key_values is not None:
+            print(past_key_values)
             past_length = past_key_values[0][8]
             # Some generation methods already pass only the last input ID
             if input_ids.shape[1] > past_length:

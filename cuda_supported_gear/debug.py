@@ -8,10 +8,6 @@ import torch
 import argparse
 
 
-#### Config for KIVI model
-# import os
-# my_token = os.environ.get("HUGGINGFACE_API_TOKEN")
-# config = LlamaConfig.from_pretrained("meta-llama/Llama-2-7b-hf", token=my_token)
 config = LlamaConfig.from_pretrained("meta-llama/Llama-2-7b-hf")
 
 config.k_bits = 2# current support 2/4 bit for KV Cache
@@ -21,7 +17,7 @@ config.residual_length = 64 # the number of recent fp16 tokens
 
 # quantization_config = BitsAndBytesConfig(load_in_8bit=True)
 parser = argparse.ArgumentParser(description="Evaluate AQuA Tasks")
-parser.add_argument("--batch_size", type=int, default=8, help="Batch size.")
+parser.add_argument("--batch_size", type=int, default=4, help="Batch size.")
 # parser.add_argument("--model", type=str, default="meta-llama/Llama-2-7b", help="Model name or path.")
 parser.add_argument("--model", type=str, default="None", help="Model name or path.")
 args = parser.parse_args()
@@ -92,13 +88,15 @@ print("time",end - start)
 
 
 
-import torch
-from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
+# import torch
+# from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 
-rotary_emb = LlamaRotaryEmbedding(
-                128,
-                max_position_embeddings=4096,
-                base=10000.0,
-            ).to("cuda:0")
-dummy_value_states = torch.randn((32, 1000, 128), dtype=torch.float16).to("cuda:0")
-rotary_emb(dummy_value_states, seq_len=1000)
+# rotary_emb = LlamaRotaryEmbedding(
+#                 128,
+#                 max_position_embeddings=4096,
+#                 base=10000.0,
+#             ).to("cuda:0")
+# dummy_value_states = torch.randn((32, 1000, 128), dtype=torch.float16).to("cuda:0")
+# dummy_position_ids = torch.arange(dummy_value_states.size(1)).unsqueeze(0).to("cuda:0")
+# cos, sin = rotary_emb(dummy_value_states, seq_len=1000, position_ids=dummy_position_ids)
+# print(cos, sin)

@@ -201,7 +201,7 @@ class LlamaAttention_GEAR(nn.Module):
         kv_seq_len = key_states.shape[-2]
         if past_key_value is not None:
             kv_seq_len += past_key_value[8]
-        cos, sin = self.rotary_emb(value_states, seq_len=kv_seq_len)
+        cos, sin = self.rotary_emb(value_states, seq_len=kv_seq_len, position_ids=position_ids) # add position_ids arguments
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin, position_ids)
         assert self.num_key_value_groups == 1
         # [bsz, nh, t, hd]
@@ -797,7 +797,9 @@ class LlamaForCausalLM_GEARKIVI(LlamaPreTrainedModel):
             return_dict=return_dict,
         )
 
-        print(outputs)
+        # print(f"last hidden state shape : {outputs.last_hidden_state.shape}")
+        # print(f"hidden states shape : {outputs.hidden_states.shape}")
+        # print(f"attentions shape : {outputs.attentions.shape}")
 
         hidden_states = outputs[0]
         if self.config.pretraining_tp > 1:
@@ -837,7 +839,34 @@ class LlamaForCausalLM_GEARKIVI(LlamaPreTrainedModel):
         self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs
     ):
         if past_key_values is not None:
-            print(past_key_values)
+            
+            # debug
+            # for layer_idx in range(1):
+            #     (key_states_quant_trans, key_states_full, key_scale_trans, key_mn_trans, value_states_quant, value_states_full, value_scale, value_mn, kv_seq_len,
+            #               key_states_p, 
+            #               key_states_q, 
+            #               _,
+            #               _,
+            #               value_states_p,
+            #               value_states_q,
+            #               _,
+            #               _) = past_key_values[layer_idx]
+            #     print(f"===== LAYER {layer_idx} =====")
+            #     print(f"key_states_quant_trans shape : {key_states_quant_trans.shape}")
+            #     print(f"key_states_full shape : {key_states_full.shape if key_states_full is not None else None}")
+            #     print(f"key_scale_trans shape : {key_scale_trans.shape}")
+            #     print(f"key_mn_trans shape : {key_mn_trans.shape}")
+            #     print(f"value_states_quant shape : {value_states_quant.shape}")
+            #     print(f"value_states_full shape : {value_states_full.shape if value_states_full is not None else None}")
+            #     print(f"value_scale shape : {value_scale.shape}")
+            #     print(f"value_mn shape : {value_mn.shape}")
+            #     print(f"kv_seq_len : {kv_seq_len}")
+            #     print(f"key_states_p shape : {key_states_p[0].shape}")
+            #     print(f"key_states_q shape : {key_states_q[0].shape}")
+            #     print(f"value_states_p shape : {value_states_p[0].shape}")
+            #     print(f"value_states_q shape : {value_states_q[0].shape}")
+            # end debug
+
             past_length = past_key_values[0][8]
             # Some generation methods already pass only the last input ID
             if input_ids.shape[1] > past_length:

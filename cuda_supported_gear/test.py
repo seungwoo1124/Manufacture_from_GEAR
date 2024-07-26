@@ -21,7 +21,7 @@ config.residual_length = 64 # the number of recent fp16 tokens
 
 # quantization_config = BitsAndBytesConfig(load_in_8bit=True)
 parser = argparse.ArgumentParser(description="Evaluate AQuA Tasks")
-parser.add_argument("--batch_size", type=int, default=8, help="Batch size.")
+parser.add_argument("--batch_size", type=int, default=4, help="Batch size.")
 # parser.add_argument("--model", type=str, default="meta-llama/Llama-2-7b", help="Model name or path.")
 parser.add_argument("--model", type=str, default="None", help="Model name or path.")
 args = parser.parse_args()
@@ -109,7 +109,7 @@ end = time.time()
 peak_memory = torch.cuda.max_memory_allocated(device="cuda") / (1024**2)  # 转换为MB单位
 
 print(f"Peak memory usage on GPU: {peak_memory} MB")
-print("time",end - start)
+print("time",end - start, 's')
 # result = tokenizer.batch_decode(result, skip_special_tokens=True)
 # print(result)
 # model = model.cuda()

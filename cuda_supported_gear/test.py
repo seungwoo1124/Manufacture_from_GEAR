@@ -26,8 +26,8 @@ parser.add_argument("--batch_size", type=int, default=4, help="Batch size.")
 parser.add_argument("--model", type=str, default="None", help="Model name or path.")
 args = parser.parse_args()
 
-max_token = 1000 ### prefill_length
-max_generation_length = 1500 ### geneate 500
+max_token = 500 ### prefill_length
+max_generation_length = 1000 ### geneate 500
 batch_size = args.batch_size
 
 ##### Config for 

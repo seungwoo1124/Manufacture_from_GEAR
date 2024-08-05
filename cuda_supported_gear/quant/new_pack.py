@@ -218,6 +218,8 @@ def triton_quantize_and_pack_along_last_dim(data: torch.Tensor, group_size: int,
     assert len(data.shape) == 4
     shape = data.shape
     B, nh, D, T = shape
+    # B : Batch size, nh : number of heads, D : kv seq len, T : head dim
+    print(f"B : {B}, nh : {nh}, D : {D}, T : {T}")
     # ================== Get Scale & Zeros ===============
     assert T % group_size == 0
     num_groups = T // group_size
@@ -254,6 +256,9 @@ def triton_quantize_and_pack_along_last_dim_witherror(data: torch.Tensor, group_
     assert len(data.shape) == 4
     shape = data.shape
     B, nh, D, T = shape
+    # B : batch size, nh : number of heads
+    # D : key 의 경우에는 head dim, value 의 경우에는 seq len
+    # T : key 의 경우에는 seq len, value 의 경우에는 head dim
     # ================== Get Scale & Zeros ===============
     assert T % group_size == 0
     num_groups = T // group_size
@@ -276,7 +281,11 @@ def triton_quantize_and_pack_along_last_dim_witherror(data: torch.Tensor, group_
     quant_data = quant_data.clamp_(0, 2 ** bit - 1).round_()
     dequant_sim_data = quant_data * scale.unsqueeze(-1) + mn.unsqueeze(-1)
     error = data - dequant_sim_data
+
+    # 차원 복구 전 : (B * nh * D, num_groups, group_size)
     quant_data = quant_data.view(-1, T).to(torch.int32)
+    # 차원 복구 후 : (B * nh * D, T)
+
     feat_per_int = 32 // bit
     packshape = (np.prod(shape[:-1]), shape[-1] // feat_per_int,)
     code = torch.zeros(*packshape, device=quant_data.device, dtype=torch.int32)

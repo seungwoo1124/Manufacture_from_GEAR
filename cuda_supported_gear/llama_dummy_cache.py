@@ -147,6 +147,11 @@ class LlamaAttention_DummyKV(nn.Module):
         assert self.num_key_value_groups == 1
 
         if past_key_value is not None:
+            print("======== PAST KEY VALUE =========")
+            print(f"past_key_value shape : {past_key_value[0].shape} {past_key_value[1].shape}")
+            print(f"key value sequence length : {past_key_value[2]}")
+            print()
+            
             key_cache = past_key_value[0]
             value_cache = past_key_value[1]
             if key_cache is not None:
@@ -777,7 +782,7 @@ if __name__ == "__main__":
     import torch
     import argparse
 
-
+    DEVICE = "cuda:1"
     config = LlamaConfig.from_pretrained("meta-llama/Llama-2-7b-hf")
 
     config.k_bits = 2# current support 2/4 bit for KV Cache
@@ -814,7 +819,7 @@ if __name__ == "__main__":
         # quantization_config = quantization_config,
         # compress_config = compress_config,
         torch_dtype=torch.float16, # FP16 으로 불러오도록 추가됨.
-        device_map = "cuda:0"
+        device_map = DEVICE
     )
 
     model = model.half()
@@ -841,7 +846,7 @@ if __name__ == "__main__":
         truncation=True,
     )
     print("begin")
-    inputs = inputs.to("cuda:0")
+    inputs = inputs.to(DEVICE)
     print(inputs.input_ids.shape)
     import time
 
@@ -849,7 +854,7 @@ if __name__ == "__main__":
     result = model.generate(**inputs, max_length=max_generation_length, use_cache=True)
     torch.cuda.synchronize()
     end = time.time()
-    peak_memory = torch.cuda.max_memory_allocated(device="cuda") / (1024**2) 
+    peak_memory = torch.cuda.max_memory_allocated(device=DEVICE) / (1024**2) 
 
     print(f"Peak memory usage on GPU: {peak_memory} MB")
     print("time",end - start)
